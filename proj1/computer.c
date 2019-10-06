@@ -181,14 +181,93 @@ unsigned int Fetch ( int addr) {
 /* Decode instr, returning decoded instruction. */
 void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
-	//We have the instruction in hex, and we need to convert it to the "Basic" Instruction and put it into d by converting it to binary, and then read register values into rVals by partioning the binary. 
+	//my code is below
+	//1. what's going in: instruct in hex
+	//2. given our hex, convert to binary 
 	int i = 0;
-	int binaryCode[32];
 	
-	while(instr[i]) {
-		
-		switch (instr[i]
+	char binary[32];
+	char temp_str[4];
+	
+	while (instr[i]) {
+		switch (instr[i]){
+		case '0':
+			temp_str = "0000";
+			strcat(binary,temp_str);
+			break;
+		case '1':
+			temp_str = "0001";
+			strcat(binary,temp_str);
+			break;
+		case '2':
+			temp_str = "0010";
+			strcat(binary,temp_str);
+			break;	
+		case '3':
+			temp_str = "0011";
+			strcat(binary,temp_str);
+			break;
+		case '4':
+			temp_str = "0100";
+			strcat(binary,temp_str);
+			break;
+		case '5':
+			temp_str = "0101";
+			strcat(binary,temp_str);
+			break;
+		case '6':
+			temp_str = "0110";
+			strcat(binary,temp_str);
+			break;
+		case '7':
+			temp_str = "0111";
+			strcat(binary,temp_str);
+			break;
+		case '8':
+			temp_str = "1000";
+			strcat(binary,temp_str);
+			break;
+		case '9':
+			temp_str = "1001";
+			strcat(binary,temp_str);
+			break;
+		case 'a':
+			temp_str = "1010";
+			strcat(binary,temp_str);
+			break;
+		case 'b':
+			temp_str = "1011";
+			strcat(binary,temp_str);
+			break;
+		case 'c':
+			temp_str = "1100";
+			strcat(binary,temp_str);
+			break;
+		case 'd':
+			temp_str = "1101";
+			strcat(binary,temp_str);
+			break;
+		case 'e':
+			temp_str = "1110";
+			strcat(binary,temp_str);
+			break;
+		case 'f':
+			temp_str = "1111";
+			strcat(binary,temp_str);
+			break;
+		}
+		i++;
 	}
+	
+	//grab first 6 bits of binary and put it into d, this isn't the right way to do this, maybe append an int
+	for (int j = 0; j < 6; j++){
+		d.op = binary[j];
+	}
+	
+	//from there check what the opcode is, depending on what the opcode is, change InstrType
+	//Depending on InstrType, we can fill in the values for the structs of either RRegs, IRegs, or JRegs
+	//d.Rregs.rs = 2;
+	
 	
 }
 
