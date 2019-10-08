@@ -182,8 +182,7 @@ unsigned int Fetch ( int addr) {
 void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
 	//my code is below
-	//1. what's going in: instruct in hex
-	//2. given our hex, convert to binary 
+	
 	int i = 0;
 	
 	char binary[32];
@@ -300,48 +299,52 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 			binary[j];
 			
 			if (binary[j] = '00000') {
-				d.RRegs.rs = 0;
+				d.r.rs = 0;
 			} else if (binary[j] = '00010') {
-				d.RRegs.rs = 2;
+				d.r.rs = 2;
 			} else if (binary[j] = '00011') {
-				d.RRegs.rs = 3;
+				d.r.rs = 3;
 			} else if (binary[j] = '00100') {
-				d.RRegs.rs = 4;
+				d.r.rs = 4;
 			} else if (binary[j] = '00101') {
-				d.RRegs.rs = 5;
+				d.r.rs = 5;
 			} else if (binary[j] = '00110') {
-				d.RRegs.rs = 6;
+				d.r.rs = 6;
 			} else if (binary[j] = '00111') {
-				d.RRegs.rs = 7;
+				d.r.rs = 7;
 			} else if (binary[j] = '01000') {
-				d.RRegs.rs = 8;
+				d.r.rs = 8;
 			} else if (binary[j] = '01001') {
-				d.RRegs.rs = 9;
+				d.r.rs = 9;
 			} else if (binary[j] = '01010') {
-				d.RRegs.rs = 10;
+				d.r.rs = 10;
 			} else if (binary[j] = '01011') {
-				d.RRegs.rs = 11;
+				d.r.rs = 11;
 			} else if (binary[j] = '01100') {
-				d.RRegs.rs = 12;
+				d.r.rs = 12;
 			} else if (binary[j] = '01101') {
-				d.RRegs.rs = 13;
+				d.r.rs = 13;
 			} else if (binary[j] = '01111') {
-				d.RRegs.rs = 14;
+				d.r.rs = 14;
 			} else if (binary[j] = '10000') {
-				d.RRegs.rs = 15;
+				d.r.rs = 15;
 			} else if (binary[j] = '10001') {
-				d.RRegs.rs = 16;
+				d.r.rs = 16;
 			} else if (binary[j] = '10010') {
-				d.RRegs.rs = 17;
+				d.r.rs = 17;
 			} else if (binary[j] = '10011') {
-				d.RRegs.rs = 18;
+				d.r.rs = 18;
 			} else if (binary[j] = '10100') {
-				d.RRegs.rs = 19;
+				d.r.rs = 19;
 			}
 		}
 	}
 	
 }
+	//implement filling in Reg vals. 
+	rVals->R_rs = mips.registers[rs];
+    rVals->R_rt = mips.registers[rt];
+    rVals->R_rd = mips.registers[rd];
 
 /*
  *  Print the disassembled version of the given instruction
@@ -349,11 +352,15 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
  */
 void PrintInstruction ( DecodedInstr* d) {
     /* Your code goes here */
+	
 }
 
 /* Perform computation needed to execute d, returning computed value */
 int Execute ( DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
+	if (RRegs) {
+		if 
+	}
   return 0;
 }
 
