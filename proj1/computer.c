@@ -175,7 +175,7 @@ void PrintInfo ( int changedReg, int changedMem) {
  *  instruction fetch. 
  */
 unsigned int Fetch ( int addr) {
-    return mips.memory[(addr-0x00400000)/4];
+    return mips.memory[(addr-0x00400000)/4]; // this is an integer and comouter stores in 0s and 1s
 }
 
 /* Decode instr, returning decoded instruction. */
@@ -183,85 +183,9 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
 	//my code is below
 	
-	int i = 0;
+	d.op = instr >> 26 //grab first 6 bits of binary and put it into d.op
 	
-	char binary[32];
-	char temp_str[4];
-	
-	while (instr[i]) {
-		switch (instr[i]){
-		case '0':
-			temp_str = "0000";
-			strcat(binary,temp_str);
-			break;
-		case '1':
-			temp_str = "0001";
-			strcat(binary,temp_str);
-			break;
-		case '2':
-			temp_str = "0010";
-			strcat(binary,temp_str);
-			break;	
-		case '3':
-			temp_str = "0011";
-			strcat(binary,temp_str);
-			break;
-		case '4':
-			temp_str = "0100";
-			strcat(binary,temp_str);
-			break;
-		case '5':
-			temp_str = "0101";
-			strcat(binary,temp_str);
-			break;
-		case '6':
-			temp_str = "0110";
-			strcat(binary,temp_str);
-			break;
-		case '7':
-			temp_str = "0111";
-			strcat(binary,temp_str);
-			break;
-		case '8':
-			temp_str = "1000";
-			strcat(binary,temp_str);
-			break;
-		case '9':
-			temp_str = "1001";
-			strcat(binary,temp_str);
-			break;
-		case 'a':
-			temp_str = "1010";
-			strcat(binary,temp_str);
-			break;
-		case 'b':
-			temp_str = "1011";
-			strcat(binary,temp_str);
-			break;
-		case 'c':
-			temp_str = "1100";
-			strcat(binary,temp_str);
-			break;
-		case 'd':
-			temp_str = "1101";
-			strcat(binary,temp_str);
-			break;
-		case 'e': 
-			temp_str = "1110";
-			strcat(binary,temp_str);
-			break;
-		case 'f':
-			temp_str = "1111";
-			strcat(binary,temp_str);
-			break;
-		}
-		i++;
-	}
-	
-	//CHECK WITH DANIEL IF WE CAN DO THIS
-	//grab first 6 bits of binary and put it into d, this isn't the right way to do this, maybe append an int
-	d.op = binary[0];
-	
+	/*d.op = binary[0];
 	for (int j = 1; j < 6; j++){
 		if (binary[j] == '0')
 			d.op = d.op << 1;
@@ -269,82 +193,91 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 			d.op = d.op << 1;
 			d.op = d.op | 1;
 		}	
-	}
+	}*/
 	
 	//from there check what the opcode is, depending on what the opcode is, change InstrType
-	if (d.op == 000000) {
-		d.op = binary[6];
-		for (i = 7; i < 11; i++) {
-			if (binary[i] == '0')
-				d.r.rs = d.r.rs << 1;
-			else (binary[i] == '1') {
-				d.r.rs = d.r.rs << 1;
-				d.r.rs = d.r.rs | 1;
-			}
-		}
-		d.r.rs = //get the next 5 bits same way we did op
-		d.RRegs.rt = //Same as above
-		d.Rregs.rd
-	} else if ( op == 2 || op == 3) {
-		d.JRegs.target = //However many bits is target in J format instructions.
+	if (d.op == 0) {
+		d.type = R;
+		unsigned instr1 = instr; // instr1 is the 5 bits of rs 
+		instr1 = instr1 >> 21; // you still have the 11 bits that includes the opcode
+		//get rid of the opcode
+		instr1 = instr1 << 6;
+		instr1 = instr1 >> 6;
+		
+		d.r.rs = instr1;
+		
+		unsigned instr2 = instr; // instr2 is the 5 bits of rt
+		instr2 = instr2 >> 16;
+		//get rid of the opcode and rs
+		instr2 = instr2 << 11;
+		instr2 = instr2 >> 11;
+		
+		d.r.rt = instr2;
+		
+		unsigned instr3 = instr; // instr3 is the 5 bits of rd
+		instr3 = instr3 >> 11;
+		//get rid of the opcode, rs and rt
+		instr2 = instr2 << 16;
+		instr2 = instr2 >> 16;
+		
+		d.r.rd = instr3;
+		
+		unsigned instr4 = instr; // instr4 is the 5 bits of shamt
+		instr4 = instr4 >> 5;
+		//get rid of the opcode, rs, rt, rd
+		instr4 = instr4 << 21;
+		instr4 = instr4 >> 21;
+		
+		d.r.shamt = instr4;
+		
+		unsigned instr5 = instr; // instr5 is the 5 bits of funct
+		//get rid of the opcode, rs, rt, rd, shamt
+		instr5 = instr5 << 26;
+		instr5 = instr5 >> 26;
+		
+		d.r.funct = instr5;
+		
+		rVals.R_rs = mips.registers[d.r.rs];
+		rVals.R_rt = mips.registers[d.r.rt];
+		//used in ALU: rVals.R_rd = mips.registers[d.r.rd];
+		
+	} else if ( d.op == 2 || d.op == 3) {
+		d.type = J;
+		unsigned instr1 = instr; //instr1 is the 26 bits of "target" or immediate
+		instr1 = instr1 << 6;
+		instr1 = instr1 >> 6;
+		
+		d.j.target = instr1;
+		
 	} else {
-		d.DecodedInstr = IRegs		
+		d.type = I;	
+		unsigned instr1 = instr; // instr1 is the 5 bits of rs
+		//get rid of opcode
+		instr1 = instr1 >> 21;
+		instr1 = instr1 << 6;
+		instr1 = instr1 >> 6;
+		
+		d.i.rs = instr1;
+		
+		unsigned instr2 = instr; // instr2 is the 5 bits of rt
+		instr2 = instr2 >> 16;
+		//get rid of the opcode and rs
+		instr2 = instr2 << 11;
+		instr2 = instr2 >> 11;
+		
+		d.i.rt = instr2;
+		
+		unsigned instr3 = instr; // instr3 is the 16 bits of "addr_or_immed"
+		//get rid of the opcode, rs, rt
+		instr3 = instr3 << 16;
+		instr3 = instr3 >> 16;
+		
+		d.i.addr_or_immed = instr3;
+		
+		rVals.R_rs = mips.registers[d.i.rs];
+		rVals.R_rt = mips.registers[d.i.rt];
 	}
-	
-
-	//Depending on InstrType, we can fill in the values for the structs of either RRegs, IRegs, or JRegs
-	//d.Rregs.rs = 2;
-	if (Rregs) {
-		for (int j = 6; j < 11; j++){
-			binary[j];
-			
-			if (binary[j] = '00000') {
-				d.r.rs = 0;
-			} else if (binary[j] = '00010') {
-				d.r.rs = 2;
-			} else if (binary[j] = '00011') {
-				d.r.rs = 3;
-			} else if (binary[j] = '00100') {
-				d.r.rs = 4;
-			} else if (binary[j] = '00101') {
-				d.r.rs = 5;
-			} else if (binary[j] = '00110') {
-				d.r.rs = 6;
-			} else if (binary[j] = '00111') {
-				d.r.rs = 7;
-			} else if (binary[j] = '01000') {
-				d.r.rs = 8;
-			} else if (binary[j] = '01001') {
-				d.r.rs = 9;
-			} else if (binary[j] = '01010') {
-				d.r.rs = 10;
-			} else if (binary[j] = '01011') {
-				d.r.rs = 11;
-			} else if (binary[j] = '01100') {
-				d.r.rs = 12;
-			} else if (binary[j] = '01101') {
-				d.r.rs = 13;
-			} else if (binary[j] = '01111') {
-				d.r.rs = 14;
-			} else if (binary[j] = '10000') {
-				d.r.rs = 15;
-			} else if (binary[j] = '10001') {
-				d.r.rs = 16;
-			} else if (binary[j] = '10010') {
-				d.r.rs = 17;
-			} else if (binary[j] = '10011') {
-				d.r.rs = 18;
-			} else if (binary[j] = '10100') {
-				d.r.rs = 19;
-			}
-		}
-	}
-	
 }
-	//implement filling in Reg vals. 
-	rVals->R_rs = mips.registers[rs];
-    rVals->R_rt = mips.registers[rt];
-    rVals->R_rd = mips.registers[rd];
 
 /*
  *  Print the disassembled version of the given instruction
@@ -352,15 +285,23 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
  */
 void PrintInstruction ( DecodedInstr* d) {
     /* Your code goes here */
+	if (d.type ==  R) {
+		if (d.r.funct == 32)
+			print("add     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 33)
+			print("addu    $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 36)
+			print("and     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 8)
+			print("jr      $%d\n", d.r.rs);
+	}
 	
 }
 
 /* Perform computation needed to execute d, returning computed value */
 int Execute ( DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
-	if (RRegs) {
-		if 
-	}
+	
   return 0;
 }
 
