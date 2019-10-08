@@ -182,7 +182,8 @@ unsigned int Fetch ( int addr) {
 void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
 	//my code is below
-	
+	//1. what's going in: instruct in hex
+	//2. given our hex, convert to binary 
 	int i = 0;
 	
 	char binary[32];
@@ -260,35 +261,117 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 	
 	//CHECK WITH DANIEL IF WE CAN DO THIS
 	//grab first 6 bits of binary and put it into d, this isn't the right way to do this, maybe append an int
-	d.op = binary[0];
+	d->op = binary[0];
 	
 	for (int j = 1; j < 6; j++){
 		if (binary[j] == '0')
-			d.op = d.op << 1;
+			d->op = d->op << 1;
 		else (binary[j] == '1') {
-			d.op = d.op << 1;
-			d.op = d.op | 1;
+			d->op = d->op << 1;
+			d->op = d->op | 1;
 		}	
 	}
 	
 	//from there check what the opcode is, depending on what the opcode is, change InstrType
-	if (d.op == 000000) {
-		d.op = binary[6];
+	//R Type Instructions
+	if (d->op == 000000) { 
+		assert(d->type == R);
+		d->regs.r.rs = binary[6];
 		for (i = 7; i < 11; i++) {
 			if (binary[i] == '0')
-				d.r.rs = d.r.rs << 1;
+				d->regs.r.rs = d->regs.r.rs << 1;
 			else (binary[i] == '1') {
-				d.r.rs = d.r.rs << 1;
-				d.r.rs = d.r.rs | 1;
+				d->regs.r.rs = d->regs.r.rs << 1;
+				d->regs.r.rs = d->regs.r.rs | 1;
 			}
 		}
-		d.r.rs = //get the next 5 bits same way we did op
-		d.RRegs.rt = //Same as above
-		d.Rregs.rd
-	} else if ( op == 2 || op == 3) {
-		d.JRegs.target = //However many bits is target in J format instructions.
-	} else {
-		d.DecodedInstr = IRegs		
+		
+		d->regs.r.rt = binary[11];
+		for (i = 12; i < 16; i++) {
+			if (binary[i] == '0')
+				d->regs.r.rt = d->regs.r.rt << 1;
+			else (binary[i] == '1') {
+				d->regs.r.rt = d->regs.r.rt << 1;
+				d->regs.r.rt = d->regs.r.rt | 1;
+			}
+		}
+		
+		d->regs.r.rd = binary[16];
+		for (i = 17; i < 21; i++) {
+			if (binary[i] == '0')
+				d->regs.r.rd = d->regs.r.rd << 1;
+			else (binary[i] == '1') {
+				d->regs.r.rd = d->regs.r.rd << 1;
+				d->regs.r.rd = d->regs.r.rd | 1;
+			}
+		}
+		
+		d->regs.r.shamt = binary[21];
+		for (i = 22; i < 26; i++) {
+			if (binary[i] == '0')
+				d->regs.r.shamt = d->regs.r.shamt << 1;
+			else (binary[i] = '1') {
+				d->regs.r.shamt = d->regs.r.shamt << 1;
+				d->regs.r.shamt = d->regs.r.shamt | 1;
+			}
+		}
+		
+		d->regs.r.funct = binary[26];
+		for (i = 27; i < 32; i++) {
+			if (binary[i] == '0')
+				d->regs.r.funct = d->regs.r.funct << 1;
+			else (binary[i] = '1') {
+				d->regs.r.funct = d->regs.r.funct << 1;
+				d->regs.r.funct = d->regs.r.funct |1;
+			}
+		}
+		
+	//I type instructions, don't know if lw and sw opcode is correct
+	} else if (d->op == 001000 || d->op == 001001 || d->op == 001100 || d->op == 000100 || d->op == 000101 || d->op == 001111 || d->op == 100011 || d->op == 101011) {
+		assert(d->type == I);
+		d->regs.i.rs = binary[6];
+		for (int i = 7; i < 11; i++) {
+			if (binary[i] == '0')
+				d->regs.i.rs = d->regs.i.rs << 1;
+			else (binary[i] = '1') {
+				d->regs.i.rs = d->regs.i.rs << 1;
+				d->regs.i.rs = r->regs.i.rs | 1;
+			}
+		}
+		
+		d->regs.i.rt = binary[11];
+		for (int i = 12; i < 16; i++) {
+			if (binary[i] == '0')
+				d->regs.i.rt = d->regs.i.rt << 1;
+			else (binary[i] == '1') {
+				d->regs.i.rt = d->regs.i.rt << 1;
+				d->regs.i.rt = d->regs.i.rt | 1;
+			}
+		}
+		
+		d->regs.i.addr_or_immed = binary[16];
+		for (int i = 17; i < 32; i++) {
+			if (binary[i] == '0')
+				d->regs.i.addr_or_immed = d->regs.i.addr_or_immed << 1;
+			else (binary[i] == '1') {
+				d->regs.i.addr_or_immed = d->regs.i.addr_or_immed << 1;
+				d->regs.i.addr_or_immed = d->regs.i.addr_or_immed | 1;
+			}
+		}
+		
+	//J type instructions!
+	} else (d->op == 000010 || d->op == 000011) {
+		assert(d->type = I);
+		d->regs.j.target = binary[6];
+		for (int i = 7; i < 32; i++) {
+			if (binary[i] == '0')
+				d->regs.j.target = d->regs.j.target << 1;
+			else (binary[i] == '1') {
+				d->regs.j.target = d->regs.j.target << 1;
+				d->regs.j.target = d->regs.j.target | 1;
+			}
+		}
+		
 	}
 	
 
@@ -299,52 +382,48 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 			binary[j];
 			
 			if (binary[j] = '00000') {
-				d.r.rs = 0;
+				d.RRegs.rs = 0;
 			} else if (binary[j] = '00010') {
-				d.r.rs = 2;
+				d.RRegs.rs = 2;
 			} else if (binary[j] = '00011') {
-				d.r.rs = 3;
+				d.RRegs.rs = 3;
 			} else if (binary[j] = '00100') {
-				d.r.rs = 4;
+				d.RRegs.rs = 4;
 			} else if (binary[j] = '00101') {
-				d.r.rs = 5;
+				d.RRegs.rs = 5;
 			} else if (binary[j] = '00110') {
-				d.r.rs = 6;
+				d.RRegs.rs = 6;
 			} else if (binary[j] = '00111') {
-				d.r.rs = 7;
+				d.RRegs.rs = 7;
 			} else if (binary[j] = '01000') {
-				d.r.rs = 8;
+				d.RRegs.rs = 8;
 			} else if (binary[j] = '01001') {
-				d.r.rs = 9;
+				d.RRegs.rs = 9;
 			} else if (binary[j] = '01010') {
-				d.r.rs = 10;
+				d.RRegs.rs = 10;
 			} else if (binary[j] = '01011') {
-				d.r.rs = 11;
+				d.RRegs.rs = 11;
 			} else if (binary[j] = '01100') {
-				d.r.rs = 12;
+				d.RRegs.rs = 12;
 			} else if (binary[j] = '01101') {
-				d.r.rs = 13;
+				d.RRegs.rs = 13;
 			} else if (binary[j] = '01111') {
-				d.r.rs = 14;
+				d.RRegs.rs = 14;
 			} else if (binary[j] = '10000') {
-				d.r.rs = 15;
+				d.RRegs.rs = 15;
 			} else if (binary[j] = '10001') {
-				d.r.rs = 16;
+				d.RRegs.rs = 16;
 			} else if (binary[j] = '10010') {
-				d.r.rs = 17;
+				d.RRegs.rs = 17;
 			} else if (binary[j] = '10011') {
-				d.r.rs = 18;
+				d.RRegs.rs = 18;
 			} else if (binary[j] = '10100') {
-				d.r.rs = 19;
+				d.RRegs.rs = 19;
 			}
 		}
 	}
 	
 }
-	//implement filling in Reg vals. 
-	rVals->R_rs = mips.registers[rs];
-    rVals->R_rt = mips.registers[rt];
-    rVals->R_rd = mips.registers[rd];
 
 /*
  *  Print the disassembled version of the given instruction
@@ -352,15 +431,11 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
  */
 void PrintInstruction ( DecodedInstr* d) {
     /* Your code goes here */
-	
 }
 
 /* Perform computation needed to execute d, returning computed value */
 int Execute ( DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
-	if (RRegs) {
-		if 
-	}
   return 0;
 }
 
