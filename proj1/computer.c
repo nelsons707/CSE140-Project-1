@@ -189,7 +189,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 	//R TYPE HERE
 	if (d.op == 0) {
 		d.type = R;
-		unsigned rs = instr; // rs is the 5 bits of rs 
+		unsigned int rs = instr; // rs is the 5 bits of rs 
 		rs = rs >> 21; // you still have the 11 bits that includes the opcode
 		//get rid of the opcode
 		rs = rs << 6;
@@ -197,7 +197,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.rs = rs;
 		
-		unsigned rt = instr; // rt is the 5 bits of rt
+		unsigned int rt = instr; // rt is the 5 bits of rt
 		rt = rt >> 16;
 		//get rid of the opcode and rs
 		rt = rt << 11;
@@ -205,7 +205,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.rt = rt;
 		
-		unsigned rd = instr; // rd is the 5 bits of rd
+		unsigned int rd = instr; // rd is the 5 bits of rd
 		rd = rd >> 11;
 		//get rid of the opcode, rs and rt
 		rt = rt << 16;
@@ -213,7 +213,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.rd = rd;
 		
-		unsigned shamt = instr; // shamt is the 5 bits of shamt
+		unsigned int shamt = instr; // shamt is the 5 bits of shamt
 		shamt = shamt >> 5;
 		//get rid of the opcode, rs, rt, rd
 		shamt = shamt << 21;
@@ -221,7 +221,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.shamt = shamt;
 		
-		unsigned funct = instr; // funct is the 5 bits of funct
+		unsigned int funct = instr; // funct is the 5 bits of funct
 		//get rid of the opcode, rs, rt, rd, shamt
 		funct = funct << 26;
 		funct = funct >> 26;
@@ -244,7 +244,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		//I type HERE
 	} else {
 		d.type = I;	
-		unsigned rs = instr; // rs is the 5 bits of rs
+		unsigned int rs = instr; // rs is the 5 bits of rs
 		//get rid of opcode
 		rs = rs >> 21;
 		rs = rs << 6;
@@ -252,7 +252,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.i.rs = rs;
 		
-		unsigned rt = instr; // rt is the 5 bits of rt
+		unsigned int rt = instr; // rt is the 5 bits of rt
 		rt = rt >> 16;
 		//get rid of the opcode and rs
 		rt = rt << 11;
@@ -260,7 +260,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.i.rt = rt;
 		
-		unsigned rd = instr; // rd is the 16 bits of "addr_or_immed"
+		unsigned int rd = instr; // rd is the 16 bits of "addr_or_immed"
 		//get rid of the opcode, rs, rt
 		rd = rd << 16;
 		rd = rd >> 16;
