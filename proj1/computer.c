@@ -205,28 +205,28 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.rt = rt;
 		
-		unsigned instr3 = instr; // instr3 is the 5 bits of rd
-		instr3 = instr3 >> 11;
+		unsigned rd = instr; // rd is the 5 bits of rd
+		rd = rd >> 11;
 		//get rid of the opcode, rs and rt
 		rt = rt << 16;
 		rt = rt >> 16;
 		
-		d.r.rd = instr3;
+		d.r.rd = rd;
 		
-		unsigned instr4 = instr; // instr4 is the 5 bits of shamt
-		instr4 = instr4 >> 5;
+		unsigned shamt = instr; // shamt is the 5 bits of shamt
+		shamt = shamt >> 5;
 		//get rid of the opcode, rs, rt, rd
-		instr4 = instr4 << 21;
-		instr4 = instr4 >> 21;
+		shamt = shamt << 21;
+		shamt = shamt >> 21;
 		
-		d.r.shamt = instr4;
+		d.r.shamt = shamt;
 		
-		unsigned instr5 = instr; // instr5 is the 5 bits of funct
+		unsigned funct = instr; // funct is the 5 bits of funct
 		//get rid of the opcode, rs, rt, rd, shamt
-		instr5 = instr5 << 26;
-		instr5 = instr5 >> 26;
+		funct = funct << 26;
+		funct = funct >> 26;
 		
-		d.r.funct = instr5;
+		d.r.funct = funct;
 		
 		rVals.R_rs = mips.registers[d.r.rs];
 		rVals.R_rt = mips.registers[d.r.rt];
@@ -235,11 +235,11 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		//J TYPE HERE
 	} else if ( d.op == 2 || d.op == 3) {
 		d.type = J;
-		unsigned rs = instr; //rs is the 26 bits of "target" or immediate
-		rs = rs << 6;
-		rs = rs >> 6;
+		unsigned target = instr; //rs is the 26 bits of "target" or immediate
+		target = target << 6;
+		target = target >> 6;
 		
-		d.j.target = rs;
+		d.j.target = target;
 		
 		//I type HERE
 	} else {
@@ -260,12 +260,12 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.i.rt = rt;
 		
-		unsigned instr3 = instr; // instr3 is the 16 bits of "addr_or_immed"
+		unsigned rd = instr; // rd is the 16 bits of "addr_or_immed"
 		//get rid of the opcode, rs, rt
-		instr3 = instr3 << 16;
-		instr3 = instr3 >> 16;
+		rd = rd << 16;
+		rd = rd >> 16;
 		
-		d.i.addr_or_immed = instr3;
+		d.i.addr_or_immed = rd;
 		
 		rVals.R_rs = mips.registers[d.i.rs];
 		rVals.R_rt = mips.registers[d.i.rt];
