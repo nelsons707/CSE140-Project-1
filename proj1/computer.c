@@ -247,7 +247,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 			temp_str = "1101";
 			strcat(binary,temp_str);
 			break;
-		case 'e':
+		case 'e': 
 			temp_str = "1110";
 			strcat(binary,temp_str);
 			break;
@@ -259,15 +259,87 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		i++;
 	}
 	
+	//CHECK WITH DANIEL IF WE CAN DO THIS
 	//grab first 6 bits of binary and put it into d, this isn't the right way to do this, maybe append an int
-	for (int j = 0; j < 6; j++){
-		d.op = binary[j];
+	d.op = binary[0];
+	
+	for (int j = 1; j < 6; j++){
+		if (binary[j] == '0')
+			d.op = d.op << 1;
+		else (binary[j] == '1') {
+			d.op = d.op << 1;
+			d.op = d.op | 1;
+		}	
 	}
 	
 	//from there check what the opcode is, depending on what the opcode is, change InstrType
+	if (d.op == 000000) {
+		d.op = binary[6];
+		for (i = 7; i < 11; i++) {
+			if (binary[i] == '0')
+				d.r.rs = d.r.rs << 1;
+			else (binary[i] == '1') {
+				d.r.rs = d.r.rs << 1;
+				d.r.rs = d.r.rs | 1;
+			}
+		}
+		d.r.rs = //get the next 5 bits same way we did op
+		d.RRegs.rt = //Same as above
+		d.Rregs.rd
+	} else if ( op == 2 || op == 3) {
+		d.JRegs.target = //However many bits is target in J format instructions.
+	} else {
+		d.DecodedInstr = IRegs		
+	}
+	
+
 	//Depending on InstrType, we can fill in the values for the structs of either RRegs, IRegs, or JRegs
 	//d.Rregs.rs = 2;
-	
+	if (Rregs) {
+		for (int j = 6; j < 11; j++){
+			binary[j];
+			
+			if (binary[j] = '00000') {
+				d.RRegs.rs = 0;
+			} else if (binary[j] = '00010') {
+				d.RRegs.rs = 2;
+			} else if (binary[j] = '00011') {
+				d.RRegs.rs = 3;
+			} else if (binary[j] = '00100') {
+				d.RRegs.rs = 4;
+			} else if (binary[j] = '00101') {
+				d.RRegs.rs = 5;
+			} else if (binary[j] = '00110') {
+				d.RRegs.rs = 6;
+			} else if (binary[j] = '00111') {
+				d.RRegs.rs = 7;
+			} else if (binary[j] = '01000') {
+				d.RRegs.rs = 8;
+			} else if (binary[j] = '01001') {
+				d.RRegs.rs = 9;
+			} else if (binary[j] = '01010') {
+				d.RRegs.rs = 10;
+			} else if (binary[j] = '01011') {
+				d.RRegs.rs = 11;
+			} else if (binary[j] = '01100') {
+				d.RRegs.rs = 12;
+			} else if (binary[j] = '01101') {
+				d.RRegs.rs = 13;
+			} else if (binary[j] = '01111') {
+				d.RRegs.rs = 14;
+			} else if (binary[j] = '10000') {
+				d.RRegs.rs = 15;
+			} else if (binary[j] = '10001') {
+				d.RRegs.rs = 16;
+			} else if (binary[j] = '10010') {
+				d.RRegs.rs = 17;
+			} else if (binary[j] = '10011') {
+				d.RRegs.rs = 18;
+			} else if (binary[j] = '10100') {
+				d.RRegs.rs = 19;
+			}
+		}
+	}
 	
 }
 
