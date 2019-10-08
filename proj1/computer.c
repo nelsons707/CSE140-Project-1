@@ -183,7 +183,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
 	//my code is below
 	
-	d.op = instr >> 26 //grab first 6 bits of binary and put it into d.op
+	d.op = instr >> 26; //grab first 6 bits of binary and put it into d.op
 	
 	/*d.op = binary[0];
 	for (int j = 1; j < 6; j++){
@@ -198,7 +198,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 	//from there check what the opcode is, depending on what the opcode is, change InstrType
 	if (d.op == 0) {
 		d.type = R;
-		unsigned instr1 = instr; // instr1 is the 5 bits of rs 
+		unsigned int instr1 = instr; // instr1 is the 5 bits of rs 
 		instr1 = instr1 >> 21; // you still have the 11 bits that includes the opcode
 		//get rid of the opcode
 		instr1 = instr1 << 6;
@@ -206,7 +206,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.rs = instr1;
 		
-		unsigned instr2 = instr; // instr2 is the 5 bits of rt
+		unsigned int instr2 = instr; // instr2 is the 5 bits of rt
 		instr2 = instr2 >> 16;
 		//get rid of the opcode and rs
 		instr2 = instr2 << 11;
@@ -214,7 +214,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.rt = instr2;
 		
-		unsigned instr3 = instr; // instr3 is the 5 bits of rd
+		unsigned int instr3 = instr; // instr3 is the 5 bits of rd
 		instr3 = instr3 >> 11;
 		//get rid of the opcode, rs and rt
 		instr2 = instr2 << 16;
@@ -222,7 +222,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.rd = instr3;
 		
-		unsigned instr4 = instr; // instr4 is the 5 bits of shamt
+		unsigned int instr4 = instr; // instr4 is the 5 bits of shamt
 		instr4 = instr4 >> 5;
 		//get rid of the opcode, rs, rt, rd
 		instr4 = instr4 << 21;
@@ -230,7 +230,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.r.shamt = instr4;
 		
-		unsigned instr5 = instr; // instr5 is the 5 bits of funct
+		unsigned int instr5 = instr; // instr5 is the 5 bits of funct
 		//get rid of the opcode, rs, rt, rd, shamt
 		instr5 = instr5 << 26;
 		instr5 = instr5 >> 26;
@@ -243,7 +243,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 	} else if ( d.op == 2 || d.op == 3) {
 		d.type = J;
-		unsigned instr1 = instr; //instr1 is the 26 bits of "target" or immediate
+		unsigned int instr1 = instr; //instr1 is the 26 bits of "target" or immediate
 		instr1 = instr1 << 6;
 		instr1 = instr1 >> 6;
 		
@@ -251,7 +251,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 	} else {
 		d.type = I;	
-		unsigned instr1 = instr; // instr1 is the 5 bits of rs
+		unsigned int instr1 = instr; // instr1 is the 5 bits of rs
 		//get rid of opcode
 		instr1 = instr1 >> 21;
 		instr1 = instr1 << 6;
@@ -259,7 +259,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.i.rs = instr1;
 		
-		unsigned instr2 = instr; // instr2 is the 5 bits of rt
+		unsigned int instr2 = instr; // instr2 is the 5 bits of rt
 		instr2 = instr2 >> 16;
 		//get rid of the opcode and rs
 		instr2 = instr2 << 11;
@@ -267,7 +267,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		d.i.rt = instr2;
 		
-		unsigned instr3 = instr; // instr3 is the 16 bits of "addr_or_immed"
+		unsigned int instr3 = instr; // instr3 is the 16 bits of "addr_or_immed"
 		//get rid of the opcode, rs, rt
 		instr3 = instr3 << 16;
 		instr3 = instr3 >> 16;
@@ -294,8 +294,58 @@ void PrintInstruction ( DecodedInstr* d) {
 			print("and     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
 		if (d.r.funct == 8)
 			print("jr      $%d\n", d.r.rs);
-	}
-	
+		if (d.r.funct == 39)
+			print("nor     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 37)
+			print("or      $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 42)
+			print("slt     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 42)
+			print("slt     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 43)
+			print("sltu    $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 0)
+			print("sll     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.shamt);
+		if (d.r.funct == 2)
+			print("srl     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.shamt);
+		if (d.r.funct == 34)
+			print("sub     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		if (d.r.funct == 35)
+			print("subu    $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+	} else if (d.type ==  J) {
+		if (d.op == 2) 
+			print("j       $%d, 0x%x\n", //we need to know the address of the target);
+		if (d.op == 3)
+			print("jal     $%d, 0x%x\n", );
+	} else if (d.type ==  I) {
+		if (d.op == 8)
+			print("addi    $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 9)
+			print("addiu   $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 12)
+			print("andi    $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 4)
+			print("beq     0x%x\n", d.i.addr_or_immed);
+		if (d.op == 5)
+			print("bne     0x%n\n", d.i.addr_or_immed );
+		if (d.op == 36)
+			print("lbu     $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 37)
+			print("lhu     $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 48)
+			print("11      $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 15)
+			print("lui     $%d, 0x%x\n", d.r.rt, d.i.addr_or_immed);
+		if (d.op == 35)
+			print("lw      $%d, %d($%d)", d.r.rt, d.i.addr_or_immed, d.r.rs);
+		if (d.op == 13)
+			print("ori     $%d, $%d, 0x%x\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 10)
+			print("slti    $%d, $%d, 0x%x\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 11)
+			print("sltiu   $%d, $%d, 0x%x\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+		if (d.op == 43)
+			print("lw      $%d, %d($%d)", d.r.rt, d.i.addr_or_immed, d.r.rs);
 }
 
 /* Perform computation needed to execute d, returning computed value */
