@@ -257,9 +257,9 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		 
 		d.i.rt = rt;
 		
-		unsigned int addrOrImmed = instr; // rd is the 16 bits of "addr_or_immed"
+		unsigned int addrOrImmed = instr; // addrOrImmed is the 16 bits of "addr_or_immed"
 		//get rid of the opcode, rs, rt
-		addrOrImmed = addOrImmed << 16;
+		addrOrImmed = addrOrImmed << 16;
 		addrOrImmed = addrOrImmed >> 16;
 		
 		d.i.addr_or_immed = addrOrImmed;
@@ -349,35 +349,44 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 			val = rVals.R_rd;
 			
 		//AND	
-		} else (d.r.funct == 36){
+		} else (d.r.funct == 36) {
 			rVals.R_rd = rVals.R_rs & rVals.R_rt;
+			val = rVals.R_rd;
+			
 		//JR
-		} else if (d.r.funct == 8)  { 
+		} else if (d.r.funct == 8) { 
 			int PC = rVals.R_rs;
 		
 		//OR
 		} else if (d.r.funct == 37) { 
 			rVals.R_rd = rVals.R_rs | rVals.R_rt;
+			val = rVals.R_rd;
 		
 		//SLT 
-		} else if (d.r.funct == 42){
-			if (rVals.R_rs < rVals.R_rt)
+		} else if (d.r.funct == 42) {
+			if (rVals.R_rs < rVals.R_rt){
 				rVals.R_rd = 1;
-			else 
+				val = rVals.R_rd;
+				
+			}else {
 				rVals.R_rd = 0;
+				val = rVals.R_rd;
+			}
 		
 		//SLL
 		} else if (d.r.funct == 0) {
 			rVals.R_rd = rVals.R_rt << d.r.shamt;
+			val = rVals.R_rd;
 		
 		//SRL
 		} else if (d.r.funct == 2) {
 			rVals.R_rd = rVals.R_rt >> d.r.shamt;
+			val = rVals.R_rd;
 		
 		//SUBU
 		} else (d.r.funct == 35) {
 			rVals.R_rd = rVals.R_rs - rVals.R_rs;
-			
+			val = rVals.R_rd;
 		}
 			
 		
@@ -385,13 +394,15 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 	
 	if (d.type == I) {
 		//Add Immediate Unsigned
-		if (d.op == 8 || d.op == 9) {
+		if (d.op == 9) {
 			rVals.R_rt = rVals.R_rs + d.i.addr_or_immed;
+			val = rVals.R_rt;
 		}
 		
 		//And Immediate
 		if (d.op == 12) {
 			rVals.R_rt = rVals.R_rs & d.i.addr_or_immed;
+			val = rVals.R_rt;
 		}
 		
 		//Branch On Equal
@@ -411,6 +422,7 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 //ASK DANIEL
 		if (d.op == 15) {
 			rVals.R_rt = d.i.addr_or_immed;	 //Supposed to be the upper 16 bits, is this it?
+			val = rVals.R_rt;
 		}
 		
 		//Load word
@@ -421,6 +433,7 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 		//ORI
 		if (d.op == 13) {
 			rVals.R_rt = rVals.R_rs | d.i.addr_or_immed;
+			val = rVals.R_rt;
 		}
 		
 		//SW
