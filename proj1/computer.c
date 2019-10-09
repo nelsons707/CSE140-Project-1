@@ -257,12 +257,12 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		 
 		d.i.rt = rt;
 		
-		unsigned int rd = instr; // rd is the 16 bits of "addr_or_immed"
+		unsigned int addrOrImmed = instr; // rd is the 16 bits of "addr_or_immed"
 		//get rid of the opcode, rs, rt
-		rd = rd << 16;
-		rd = rd >> 16;
+		addrOrImmed = addOrImmed << 16;
+		addrOrImmed = addrOrImmed >> 16;
 		
-		d.i.addr_or_immed = rd;
+		d.i.addr_or_immed = addrOrImmed;
 		
 		rVals.R_rs = mips.registers[d.i.rs];
 		rVals.R_rt = mips.registers[d.i.rt];
