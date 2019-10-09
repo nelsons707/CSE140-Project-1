@@ -346,11 +346,56 @@ void PrintInstruction ( DecodedInstr* d) {
 			print("sltiu   $%d, $%d, 0x%x\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
 		if (d.op == 43)
 			print("lw      $%d, %d($%d)", d.r.rt, d.i.addr_or_immed, d.r.rs);
+	}
 }
 
 /* Perform computation needed to execute d, returning computed value */
 int Execute ( DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
+	if (d.type == R) {
+		if(d.r.funct == 32 || 33) {		//add instruction or addu instruction
+			rVals.R_rd = rVals.R_rs + rVals.R_rt;
+			
+		} else if (d.r.funct == 36) { 		//and instruction
+			rVals.R_rd = rVals.R_rs & rVals.R_rt;
+			
+		} else if (d.r.funct == 8)  { // jr instruction
+			int PC = rVals.R_rs;
+			
+		} else if (d.r.funct == 39) { //nor instr
+			rVals.R_rd = ~(rVals.R_rs | rVals.R_rt);
+			
+		} else if (d.r.funct == 37) { //or instr
+			rVals.R_rd = rVals.R_rs | rVals.R_rt;
+			
+		} else if (d.r.funct == 42){
+			if (rVals.R_rs < rVals.R_rt)
+				rVals.R_rd = 1;
+			else 
+				rVals.R_rd = 0;
+			
+		} else if (d.r.funct == 0) {
+			rVals.R_rd = rVals.R_rt << d.r.shamt;
+			
+		} else if (d.r.funct == 2) {
+			rVals.R_rd = 
+			
+		} else if (d.r.funct == 34) {
+			
+		} else if (d.r.funct == 35) {
+			
+		}
+			
+		
+	}
+	
+	if (d.type == I) {
+		
+	}
+	
+	if (d.type == J) {
+		
+	}
 	
   return 0;
 }
@@ -363,6 +408,7 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 void UpdatePC ( DecodedInstr* d, int val) {
     mips.pc+=4;
     /* Your code goes here */
+	
 }
 
 /*
