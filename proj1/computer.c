@@ -294,6 +294,50 @@ void PrintInstruction ( DecodedInstr* d) {
 /* Perform computation needed to execute d, returning computed value */
 int Execute ( DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
+	if (d.type == R) {
+		if(d.funct == 32 || 33) {		//add instruction or addu instruction
+			rVals.R_rd = rVals.R_rs + rVals.R_rt;
+			
+		} else if (d.funct == 36) { 		//and instruction
+			rVals.R_rd = rVals.R_rs & rVals.R_rt;
+			
+		} else if (d.funct == 8)  {
+			int PC = rVals.R_rs;
+			
+		} else if (d.funct == 39) {
+			rVals.R_rd = ~(rVals.R_rs | rVals.R_rt;
+			
+		} else if (d.funct == 37) {
+			rVals.R.rd = rVals.R_rs | rVals.R_rt;
+			
+		} else if (d.funct == 42){
+			if (rVals.R.rs < rVals.R.rt)
+				rVals.R.rd = 1;
+			else 
+				rVals.R.rd = 0;
+			
+		} else if (d.funct == 0) {
+			rVals.R.rd = rVals.R.rt << d.shamt;
+			
+		} else if (d.funct == 2) {
+			rVals.R.rd = 
+			
+		} else if (d.funct == 34) {
+			
+		} else if (d.funct == 35) {
+			
+		}
+			
+		
+	}
+	
+	if (d.type == I) {
+		
+	}
+	
+	if (d.type == J) {
+		
+	}
 	
   return 0;
 }
