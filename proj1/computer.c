@@ -441,7 +441,7 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 		
 		//Load Upper Immediate
 		if (d.op == 15) {
-			
+			rVals.R_rt = d.i.addr_or_immed;					//Supposed to be the upper 16 bits, is this it?
 		}
 		
 		//Load word
