@@ -408,7 +408,17 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 void UpdatePC ( DecodedInstr* d, int val) {
     mips.pc+=4;
     /* Your code goes here */
-	
+	if (d.op == 4)
+		mips.pc = d.i.addr_or_immed;
+	else if (d.op == 5)
+		mips.pc = d.i.addr_or_immed;
+	else if (d.op == 3)
+		mips.register[31] = mips.pc;
+		mips.pc = d.j.target;
+	else if (d.op == 2)
+		mips.pc = d.j.target;
+	else if (d.op == 0 &&  d.r.funct == 8)
+		mips.pc = mips.registers[d.r.rs];
 }
 
 /*
@@ -422,7 +432,7 @@ void UpdatePC ( DecodedInstr* d, int val) {
  *
  */
 int Mem( DecodedInstr* d, int val, int *changedMem) {
-    /* Your code goes here */
+    /* Your code goes here */	
   return 0;
 }
 
