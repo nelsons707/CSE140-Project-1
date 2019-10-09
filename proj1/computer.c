@@ -198,44 +198,44 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 	//from there check what the opcode is, depending on what the opcode is, change InstrType
 	if (d.op == 0) {
 		d.type = R;
-		unsigned int instr1 = instr; // instr1 is the 5 bits of rs 
-		instr1 = instr1 >> 21; // you still have the 11 bits that includes the opcode
+		unsigned int rs = instr; // rs is the 5 bits of rs 
+		rs = rs >> 21; // you still have the 11 bits that includes the opcode
 		//get rid of the opcode
-		instr1 = instr1 << 6;
-		instr1 = instr1 >> 6;
+		rs = rs << 6;
+		rs = rs >> 6;
 		
-		d.r.rs = instr1;
+		d.r.rs = rs;
 		
-		unsigned int instr2 = instr; // instr2 is the 5 bits of rt
-		instr2 = instr2 >> 16;
+		unsigned int rt = instr; // rt is the 5 bits of rt
+		rt = rt >> 16;
 		//get rid of the opcode and rs
-		instr2 = instr2 << 11;
-		instr2 = instr2 >> 11;
+		rt = rt << 11;
+		rt = rt >> 11;
 		
-		d.r.rt = instr2;
+		d.r.rt = rt;
 		
-		unsigned int instr3 = instr; // instr3 is the 5 bits of rd
-		instr3 = instr3 >> 11;
+		unsigned int rd = instr; // rd is the 5 bits of rd
+		rd = rd >> 11;
 		//get rid of the opcode, rs and rt
-		instr2 = instr2 << 16;
-		instr2 = instr2 >> 16;
+		rd = rd << 16;
+		rd = rd >> 16;
 		
-		d.r.rd = instr3;
+		d.r.rd = rd;
 		
-		unsigned int instr4 = instr; // instr4 is the 5 bits of shamt
-		instr4 = instr4 >> 5;
+		unsigned int shamt = instr; // shamt is the 5 bits of shamt
+		shamt = shamt >> 5;
 		//get rid of the opcode, rs, rt, rd
-		instr4 = instr4 << 21;
-		instr4 = instr4 >> 21;
+		shamt = shamt << 21;
+		shamt = shamt >> 21;
 		
-		d.r.shamt = instr4;
+		d.r.shamt = shamt;
 		
-		unsigned int instr5 = instr; // instr5 is the 5 bits of funct
+		unsigned int funct = instr; // funct is the 5 bits of funct
 		//get rid of the opcode, rs, rt, rd, shamt
-		instr5 = instr5 << 26;
-		instr5 = instr5 >> 26;
+		funct = funct << 26;
+		funct = funct >> 26;
 		
-		d.r.funct = instr5;
+		d.r.funct = funct;
 		
 		rVals.R_rs = mips.registers[d.r.rs];
 		rVals.R_rt = mips.registers[d.r.rt];
@@ -243,36 +243,36 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 	} else if ( d.op == 2 || d.op == 3) {
 		d.type = J;
-		unsigned int instr1 = instr; //instr1 is the 26 bits of "target" or immediate
-		instr1 = instr1 << 6;
-		instr1 = instr1 >> 6;
+		unsigned int target = instr; //target is the 26 bits of "target" or immediate
+		target = target << 6;
+		target = target >> 6;
 		
-		d.j.target = instr1;
+		d.j.target = target;
 		
 	} else {
 		d.type = I;	
-		unsigned int instr1 = instr; // instr1 is the 5 bits of rs
+		unsigned int rs = instr; // rs is the 5 bits of rs
 		//get rid of opcode
-		instr1 = instr1 >> 21;
-		instr1 = instr1 << 6;
-		instr1 = instr1 >> 6;
+		rs = rs >> 21;
+		rs = rs << 6;
+		rs = rs >> 6;
 		
-		d.i.rs = instr1;
+		d.i.rs = rs;
 		
-		unsigned int instr2 = instr; // instr2 is the 5 bits of rt
-		instr2 = instr2 >> 16;
+		unsigned int rt = instr; // rt is the 5 bits of rt
+		rt = rt >> 16;
 		//get rid of the opcode and rs
-		instr2 = instr2 << 11;
-		instr2 = instr2 >> 11;
+		rt = rt << 11;
+		rt = rt >> 11;
 		
-		d.i.rt = instr2;
+		d.i.rt = rt;
 		
-		unsigned int instr3 = instr; // instr3 is the 16 bits of "addr_or_immed"
+		unsigned int rd = instr; // rd is the 16 bits of "addr_or_immed"
 		//get rid of the opcode, rs, rt
-		instr3 = instr3 << 16;
-		instr3 = instr3 >> 16;
+		rd = rd << 16;
+		rd = rd >> 16;
 		
-		d.i.addr_or_immed = instr3;
+		d.i.addr_or_immed = rd;
 		
 		rVals.R_rs = mips.registers[d.i.rs];
 		rVals.R_rt = mips.registers[d.i.rt];
@@ -408,17 +408,25 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 void UpdatePC ( DecodedInstr* d, int val) {
     mips.pc+=4;
     /* Your code goes here */
-	if (d.op == 4)
+	
+	//WHAT IS 'INT VAL' ??
+	
+	if (d.op == 4){
 		mips.pc = d.i.addr_or_immed;
-	else if (d.op == 5)
+		
+	}else if (d.op == 5){
 		mips.pc = d.i.addr_or_immed;
-	else if (d.op == 3)
+		
+	}else if (d.op == 3){
 		mips.register[31] = mips.pc;
 		mips.pc = d.j.target;
-	else if (d.op == 2)
+		
+	}else if (d.op == 2){
 		mips.pc = d.j.target;
-	else if (d.op == 0 &&  d.r.funct == 8)
+		
+	}else if (d.op == 0 &&  d.r.funct == 8){
 		mips.pc = mips.registers[d.r.rs];
+	}
 }
 
 /*
