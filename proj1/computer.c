@@ -257,9 +257,9 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		 
 		d.i.rt = rt;
 		
-		unsigned int addrOrImmed = instr; // addrOrImmed is the 16 bits of "addr_or_immed"
+		unsigned int addrOrImmed = instr; // rd is the 16 bits of "addr_or_immed"
 		//get rid of the opcode, rs, rt
-		addrOrImmed = addrOrImmed << 16;
+		addrOrImmed = addOrImmed << 16;
 		addrOrImmed = addrOrImmed >> 16;
 		
 		d.i.addr_or_immed = addrOrImmed;
@@ -342,6 +342,7 @@ void PrintInstruction ( DecodedInstr* d) {
 /* Perform computation needed to execute d, returning computed value */
 int Execute ( DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
+	int val = 0;
 	if (d.type == R) {
 		//Addu
 		if(d.r.funct == 33) {		//addu instruction
@@ -353,9 +354,10 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 			rVals.R_rd = rVals.R_rs & rVals.R_rt;
 			val = rVals.R_rd;
 			
-		//JR
+		//JR 
+	//Double check this
 		} else if (d.r.funct == 8) { 
-			int PC = rVals.R_rs;
+			val = rVals.R_rs;
 		
 		//OR
 		} else if (d.r.funct == 37) { 
@@ -400,21 +402,21 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 		}
 		
 		//And Immediate
-		if (d.op == 12) {
+		else if (d.op == 12) {
 			rVals.R_rt = rVals.R_rs & d.i.addr_or_immed;
 			val = rVals.R_rt;
 		}
 		
 		//Branch On Equal
-		if (d.op == 4) {
+		else if (d.op == 4) {
 			if (rVals.R_rs == rVals.R_rt)
-				mips.pc+=4;
+				val = mips.pc + d.i.addr_or_immed;
 		}
 		
 		//Branch On Not Equal
-		if (d.op == 5) {
+		else if (d.op == 5) {
 			if (rVals.R_rs != rVals.R_rt)
-				mips.pc+=4;
+				val = mips.pc + d.i.addr_or_immed;
 		}
 		
 		
@@ -431,13 +433,13 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 		}
 		
 		//ORI
-		if (d.op == 13) {
+		else if (d.op == 13) {
 			rVals.R_rt = rVals.R_rs | d.i.addr_or_immed;
 			val = rVals.R_rt;
 		}
 		
 		//SW
-		if (d.op == 43) {
+		else (d.op == 43) {
 			
 		}
 		
@@ -445,10 +447,20 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 	}
 	
 	if (d.type == J) {
+		//JUMP
+		if (d.op == 2) {
+			
+		}
+		
+		//JUMP REGISTER
+		if (d.op == 3) {
+			val = rVals.R_rs;
+		}
+		
 		
 	}
 	
-  return 0;
+  return val;
 }
 
 /* 
@@ -462,19 +474,24 @@ void UpdatePC ( DecodedInstr* d, int val) {
 	
 	//WHAT IS 'INT VAL' ??
 	
+	//BRANCH ON EQUAL
 	if (d.op == 4){
-		mips.pc = d.i.addr_or_immed;
-		
+		mips.pc = val;
+	
+	//BRANCH ON NOT EQUAL
 	}else if (d.op == 5){
-		mips.pc = d.i.addr_or_immed;
-		
+		mips.pc = val;
+	
+	//JUMP AND LINK
 	}else if (d.op == 3){
 		mips.register[31] = mips.pc;
 		mips.pc = d.j.target;
-		
+	
+	//JUMP
 	}else if (d.op == 2){
-		mips.pc = d.j.target;
-		
+		mips.pc = val;
+	
+	//JUMP REGISTER
 	}else if (d.op == 0 &&  d.r.funct == 8){
 		mips.pc = mips.registers[d.r.rs];
 	}
@@ -495,7 +512,7 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
 	
 	int address = d.i.addr_or_immed + mips.registers[d.i.rs];
 	
-	int index = ; // we want the index to be the (address - the beginning of the address) / the size 
+	int index = ; // we want the index to be the (address - the beginning of the address) / the size (4) 
 	
 	if (d.op == 43){ // 43 = opcode of store word
 		mips.memory[index] = mips.registers[d.i.rt];
@@ -518,10 +535,15 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
 void RegWrite( DecodedInstr* d, int val, int *changedReg) {
     /* Your code goes here */
 	
-	if (d.op == 0) 
+	//R type instructions except for JR 
+	if (d.op == 0 && d.r.funct != 8) 
 		*changedReg = d.r.rd;
-	else if (d.i.rt == 2 || d.i.rt == 3)
-		*changedReg = d.i.rt;
+	
+	else if (d.type == I) 
+		*changedReg = d.r.rt;
+	
+	//else if (d.i.rt == 2 || d.i.rt == 3)
+		//*changedReg = d.i.rt;
 	else
 		return;
 	mips.registers[*changedReg] = val;
