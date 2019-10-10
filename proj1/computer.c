@@ -276,40 +276,36 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 void PrintInstruction ( DecodedInstr* d) {
     /* Your code goes here */
 	if (d.type ==  R) {
-		if (d.r.funct == 32)
-			print("add     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		
 		if (d.r.funct == 33)
 			print("addu    $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
 		if (d.r.funct == 36)
 			print("and     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
 		if (d.r.funct == 8)
 			print("jr      $%d\n", d.r.rs);
-		if (d.r.funct == 39)
-			print("nor     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		
 		if (d.r.funct == 37)
 			print("or      $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
 		if (d.r.funct == 42)
 			print("slt     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
-		if (d.r.funct == 42)
-			print("slt     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
-		if (d.r.funct == 43)
-			print("sltu    $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
+		
+		
 		if (d.r.funct == 0)
 			print("sll     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.shamt);
 		if (d.r.funct == 2)
 			print("srl     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.shamt);
-		if (d.r.funct == 34)
-			print("sub     $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
 		if (d.r.funct == 35)
 			print("subu    $%d, $%d, $%d\n", d.r.rd, d.r.rs, d.r.rt);
-	} else if (d.type ==  J) {
+	} 
+	else if (d.type ==  J) {
+		
 		if (d.op == 2) 
 			print("j       $%d, 0x%x\n", //we need to know the address of the target);
 		if (d.op == 3)
 			print("jal     $%d, 0x%x\n", );
-	} else if (d.type ==  I) {
-		if (d.op == 8)
-			print("addi    $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
+	} 
+	else if (d.type ==  I) {
+		
 		if (d.op == 9)
 			print("addiu   $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
 		if (d.op == 12)
@@ -318,25 +314,19 @@ void PrintInstruction ( DecodedInstr* d) {
 			print("beq     0x%x\n", d.i.addr_or_immed);
 		if (d.op == 5)
 			print("bne     0x%n\n", d.i.addr_or_immed );
-		if (d.op == 36)
-			print("lbu     $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
-		if (d.op == 37)
-			print("lhu     $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
-		if (d.op == 48)
-			print("11      $%d, $%d, %d\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
 		if (d.op == 15)
 			print("lui     $%d, 0x%x\n", d.r.rt, d.i.addr_or_immed);
 		if (d.op == 35)
 			print("lw      $%d, %d($%d)", d.r.rt, d.i.addr_or_immed, d.r.rs);
 		if (d.op == 13)
 			print("ori     $%d, $%d, 0x%x\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
-		if (d.op == 10)
-			print("slti    $%d, $%d, 0x%x\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
-		if (d.op == 11)
-			print("sltiu   $%d, $%d, 0x%x\n", d.r.rt, d.r.rs, d.i.addr_or_immed);
 		if (d.op == 43)
 			print("lw      $%d, %d($%d)", d.r.rt, d.i.addr_or_immed, d.r.rs);
+	} 
+	else {
+		exit(0);
 	}
+	
 }
 
 /* Perform computation needed to execute d, returning computed value */
@@ -520,10 +510,10 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
 		return -1;
 	} else if (d.op == 35) { // 35 = opcode for load word
 		return mips.memory[index];
-	}	
+	}
 	
 	
-  return 0;
+  return -1;
 }
 
 /* 
