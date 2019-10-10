@@ -543,6 +543,7 @@ void RegWrite( DecodedInstr* d, int val, int *changedReg) {
 	else if (d->op == 9 || d->op == 12 || d->op == 16 || d->op == 35 || d->op == 13 || d->op == 43) 
 		*changedReg = d->r.rt;
 	
+	//Do the ones for SW and LW
 	else
 		return;
 	mips.registers[*changedReg] = val;
