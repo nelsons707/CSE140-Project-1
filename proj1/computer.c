@@ -87,12 +87,15 @@ void Simulate () {
         /* Fetch instr at mips.pc, returning it in instr */
         instr = Fetch (mips.pc);
 
+		//printf("Before the print\n"); //checking if the program executed to here
+
         printf ("Executing instruction at %8.8x: %8.8x\n", mips.pc, instr);
 
         /* 
 	 * Decode instr, putting decoded instr in d
 	 * Note that we reuse the d struct for each instruction.
 	 */
+		
         Decode (instr, &d, &rVals);
 
         /*Print decoded instruction*/
@@ -184,90 +187,117 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
 	//my code is below
 	
-	d->op = instr >> 26; //grab first 6 bits of binary and put it into d->op
+	
+	int test = instr >> 26; //grab first 6 bits of binary and put it into d->op
+	d->op = test;
+	printf("op: %d\n", d->op);
 	
 	//from there check what the opcode is, depending on what the opcode is, change InstrType
 	if (d->op == 0) {
 		d->type = R;
 		unsigned int rs = instr; // rs is the 5 bits of rs 
-		rs = rs >> 21; // you still have the 11 bits that includes the opcode
+		rs = rs << 6; // you still have the 11 bits that includes the opcode
 		//get rid of the opcode
-		rs = rs << 6;
-		rs = rs >> 6;
+		rs = rs >> 27;
 		
 		d->regs.r.rs = rs;
 		
+		printf("rs: %d\n", d->regs.r.rs);
+		
 		unsigned int rt = instr; // rt is the 5 bits of rt
-		rt = rt >> 16;
+		//rt = rt >> 16;
 		//get rid of the opcode and rs
 		rt = rt << 11;
-		rt = rt >> 11;
+		rt = rt >> 27;
 		
 		d->regs.r.rt = rt;
 		
+		printf("rt: %u\n", d->regs.r.rt);
+		
 		unsigned int rd = instr; // rd is the 5 bits of rd
-		rd = rd >> 11;
-		//get rid of the opcode, rs and rt
 		rd = rd << 16;
-		rd = rd >> 16;
+		//get rid of the opcode, rs and rt
+		
+		rd = rd >> 27;
 		
 		d->regs.r.rd = rd;
 		
+		printf("rd: %u\n", d->regs.r.rd);
+		
 		unsigned int shamt = instr; // shamt is the 5 bits of shamt
-		shamt = shamt >> 5;
 		//get rid of the opcode, rs, rt, rd
 		shamt = shamt << 21;
-		shamt = shamt >> 21;
+		shamt = shamt >> 27;
 		
 		d->regs.r.shamt = shamt;
 		
+		printf("shamt: %u\n", d->regs.r.shamt);
+		
 		unsigned int funct = instr; // funct is the 5 bits of funct
 		//get rid of the opcode, rs, rt, rd, shamt
-		funct = funct << 26;
-		funct = funct >> 26;
+		funct = funct << 27;
+		funct = funct >> 27;
 		
 		d->regs.r.funct = funct;
 		
+		printf("funct: %u\n", d->regs.r.funct);
+		
+		//NOTE: use this form in execute (ALU) so we know exactly is being used in the execution!
 		rVals->R_rs = mips.registers[d->regs.r.rs];
 		rVals->R_rt = mips.registers[d->regs.r.rt];
-		//used in ALU: rVals->R_rd = mips.registers[d->regs.r.rd];
+		//used in ALU: rVals->R_rd = mips.registers[d->regs.r.rd]; // Went to Daniel's office hours and he helped us with this part. 
 		
-	} else if ( d->op == 2 || d->op == 3) {
+	} if ( d->op == 2 || d->op == 3) {
 		d->type = J;
 		unsigned int target = instr; //target is the 26 bits of "target" or immediate
 		target = target << 6;
 		target = target >> 6;
+		target = target << 2;
 		
 		d->regs.j.target = target;
 		
-	} else {
+		printf("target: %u\n", d->regs.j.target);
+		
+	} if (d->op == 9 || d->op == 12 || d->op ==4 || d->op == 5 || d->op == 15 || d->op == 35 || d->op == 13 || d->op == 43){
 		d->type = I;	
 		unsigned int rs = instr; // rs is the 5 bits of rs
 		//get rid of opcode
-		rs = rs >> 21;
 		rs = rs << 6;
-		rs = rs >> 6;
+		rs = rs >> 27;
+		//rs = rs & 00000011111; // this worked too but we understand the shifting bit manipulation better than this method
 		
 		d->regs.i.rs = rs;
 		
+		printf("rs: %u\n", d->regs.i.rs);
+		
 		unsigned int rt = instr; // rt is the 5 bits of rt
 		//get rid of the opcode and rs
-		rt = rt >> 16;
+		//rt = rt >> 16;
+		//rt = rt & 0000000000011111;
 		rt = rt << 11;
-		rt = rt >> 11;
+		//rt = rt >> 11;
+		rt = rt >> 27;
 		 
 		d->regs.i.rt = rt;
+		
+		printf("rt: %u\n", d->regs.i.rt);
 		
 		unsigned int addrOrImmed = instr; // rd is the 16 bits of "addr_or_immed"
 		//get rid of the opcode, rs, rt
 		addrOrImmed = addrOrImmed << 16;
 		addrOrImmed = addrOrImmed >> 16;
+
 		
 		d->regs.i.addr_or_immed = addrOrImmed;
 		
+		printf("addr or immed: %u\n", d->regs.i.addr_or_immed);
+		
 		rVals->R_rs = mips.registers[d->regs.i.rs];
 		rVals->R_rt = mips.registers[d->regs.i.rt];
-	}
+		
+		
+	} else {
+		exit(0);
 }
 
 /*
@@ -277,8 +307,6 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 void PrintInstruction ( DecodedInstr* d) {
     /* Your code goes here */
 	if (d->type ==  R) {
-		if (d->regs.r.funct == 32)
-			printf("add     $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 		if (d->regs.r.funct == 33)
 			printf("addu    $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 		if (d->regs.r.funct == 36)
@@ -305,20 +333,18 @@ void PrintInstruction ( DecodedInstr* d) {
 			printf("subu    $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 	} else if (d->type ==  J) {
 		if (d->op == 2) 
-			printf("j       0x%x\n", d->regs.j.target );//we need to know the address of the target, if this print does not match multiply target by 4
+			printf("j       0x%x\n", d->regs.j.target);//we need to know the address of the target, if this print does not match multiply target by 4
 		if (d->op == 3)
 			printf("jal     0x%x\n", d->regs.j.target);
 	} else if (d->type ==  I) {
-		if (d->op == 8)
-			printf("addi    $%d, $%d, %d\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
 		if (d->op == 9)
 			printf("addiu   $%d, $%d, %d\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
 		if (d->op == 12)
 			printf("andi    $%d, $%d, %d\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
 		if (d->op == 4)
-			printf("beq     $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed + 4 + mips.pc);  // check if this is right might have to mult by 4
+			printf("beq     $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, (d->regs.i.addr_or_immed)*4 + 4 + mips.pc);  // check if this is right might have to mult by 4
 		if (d->op == 5)
-			printf("bne     $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed + 4 + mips.pc);
+			printf("bne     $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, (d->regs.i.addr_or_immed) * 4 + 4 + mips.pc);
 		if (d->op == 36)
 			printf("lbu     $%d, $%d, %d\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
 		if (d->op == 37)
@@ -336,62 +362,49 @@ void PrintInstruction ( DecodedInstr* d) {
 		if (d->op == 11)
 			printf("sltiu   $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
 		if (d->op == 43)
-			printf("lw      $%d, %d($%d)", d->regs.i.rt, d->regs.i.addr_or_immed, d->regs.i.rs);
-	} else {
-		exit(0);
+			printf("sw      $%d, %d($%d)", d->regs.i.rt, d->regs.i.addr_or_immed, d->regs.i.rs);
 	}
+	
 }
 
 /* Perform computation needed to execute d, returning computed value */
 int Execute ( DecodedInstr* d, RegVals* rVals) {
     /* Your code goes here */
-	int val = 0;
+	//int val = 0;
+	
 	if (d->type == R) {
 		//Addu
 		if(d->regs.r.funct == 33) {		//addu instruction
-			rVals->R_rd = rVals->R_rs + rVals->R_rt;
-			val = rVals->R_rd;
+			return mips.registers[d->regs.r.rs] + mips.registers[d->regs.r.rt]; 
 			
 		//AND	
 		} else if(d->regs.r.funct == 36) {
-			rVals->R_rd = rVals->R_rs & rVals->R_rt;
-			val = rVals->R_rd;
-			
+			return mips.registers[d->regs.r.rs] & mips.registers[d->regs.r.shamt];
+						
 		//JR 
 	//Double check this
 		} else if (d->regs.r.funct == 8) { 
-			val = rVals->R_rs;
+			return mips.registers[d->regs.r.rs];
 		
 		//OR
 		} else if (d->regs.r.funct == 37) { 
-			rVals->R_rd = rVals->R_rs | rVals->R_rt;
-			val = rVals->R_rd;
+			return mips.registers[d->regs.r.rs] | mips.registers[d->regs.r.shamt];
 		
 		//SLT 
 		} else if (d->regs.r.funct == 42) {
-			if (rVals->R_rs < rVals->R_rt){
-				rVals->R_rd = 1;
-				val = rVals->R_rd;
-				
-			}else {
-				rVals->R_rd = 0;
-				val = rVals->R_rd;
-			}
+			return mips.registers[d->regs.r.rs] < mips.registers[d->regs.r.shamt];
 		
 		//SLL
 		} else if (d->regs.r.funct == 0) {
-			rVals->R_rd = rVals->R_rt << d->regs.r.shamt;
-			val = rVals->R_rd;
+			return mips.registers[d->regs.r.rs] << mips.registers[d->regs.r.shamt];
 		
 		//SRL
 		} else if (d->regs.r.funct == 2) {
-			rVals->R_rd = rVals->R_rt >> d->regs.r.shamt;
-			val = rVals->R_rd;
+			return mips.registers[d->regs.r.rs] >> mips.registers[d->regs.r.shamt];
 		
 		//SUBU
 		} else if (d->regs.r.funct == 35) {
-			rVals->R_rd = rVals->R_rs - rVals->R_rs;
-			val = rVals->R_rd;
+			return mips.registers[d->regs.r.rs] - mips.registers[d->regs.r.rt];
 		}
 			
 		
@@ -400,68 +413,66 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 	if (d->type == I) {
 		//Add Immediate Unsigned
 		if (d->op == 9) {
-			rVals->R_rt = rVals->R_rs + d->regs.i.addr_or_immed;
-			val = rVals->R_rt;
+			return mips.registers[d->regs.i.rs] + d->regs.i.addr_or_immed;
 		}
 		
 		//And Immediate
 		else if (d->op == 12) {
-			rVals->R_rt = rVals->R_rs & d->regs.i.addr_or_immed;
-			val = rVals->R_rt;
+			return mips.registers[d->regs.i.rs] & d->regs.i.addr_or_immed;
 		}
 		
 		//Branch On Equal
-		else if (d->op == 4) {
-			if (rVals->R_rs == rVals->R_rt)
-				val = mips.pc + d->regs.i.addr_or_immed;
-		}
+		//else if (d->op == 4) {
+		//	if (rVals->R_rs == rVals->R_rt)
+		//		val = mips.pc + d->regs.i.addr_or_immed;
+		//}
 		
 		//Branch On Not Equal
-		else if (d->op == 5) {
-			if (rVals->R_rs != rVals->R_rt)
-				val = mips.pc + d->regs.i.addr_or_immed;
-		}
+		//else if (d->op == 5) {
+		//	if (rVals->R_rs != rVals->R_rt)
+		//		val = mips.pc + d->regs.i.addr_or_immed;
+		//}
 		
 		
 		//Load Upper Immediate
 		else if (d->op == 15) {
-			rVals->R_rt = d->regs.i.addr_or_immed;	 //Supposed to be the upper 16 bits, is this it? 
-			val = rVals->R_rt;
+			return d->regs.i.addr_or_immed << 16;	 //Supposed to be the upper 16 bits, is this it? 
 		}
 		
 		//Load word
 		else if (d->op == 35) {
-			val = mips.registers[d->regs.i.rs] + d->regs.i.addr_or_immed;
+			d->regs.i.addr_or_immed = d->regs.i.addr_or_immed << 2;
+			return mips.registers[d->regs.i.rs] + d->regs.i.addr_or_immed;
 		}
 		
 		//ORI
 		else if (d->op == 13) {
-			rVals->R_rt = rVals->R_rs | d->regs.i.addr_or_immed;
-			val = rVals->R_rt;
+			 return mips.registers[d->regs.i.rs] | d->regs.i.addr_or_immed;
 		}
 		
 		//SW
 		else if(d->op == 43) {
-			val = d->regs.i.addr_or_immed + mips.registers[d->regs.i.rs];
+			d->regs.i.addr_or_immed = d->regs.i.addr_or_immed << 2;
+			return mips.registers[d->regs.i.rs] + d->regs.i.addr_or_immed;
 		}
-		
-		
 	}
 	
 	if (d->type == J) {
 		//JUMP
-		if (d->op == 2) {
-			val = mips.pc;
-		}
+		/*if (d->op == 2) {
+			val = d->regs.j.target;
+		} */
 		
 		//JUMP and LINK
 		if (d->op == 3) {
-			mips.registers[31] = 8 + mips.pc;
-			val = mips.registers[31];
+			return mips.pc + 4;
+			//mips.registers[31] = 8 + mips.pc;
+			//mips.pc = d->regs.j.target;
+		    //val = mips.pc;
 		}
 	}
 	
-  return val;
+  return 0;
 }
 
 /* 
@@ -473,6 +484,7 @@ void UpdatePC ( DecodedInstr* d, int val) {
     mips.pc+=4;
     /* Your code goes here */
 	
+	/*Lines 487 to 507 was our original implementation which did NOT work so we had to go back to the drawing board!
 	//BRANCH ON EQUAL
 	if (d->op == 4){
 		mips.pc = val;
@@ -494,6 +506,26 @@ void UpdatePC ( DecodedInstr* d, int val) {
 	}else if (d->op == 0 &&  d->regs.r.funct == 8){
 		mips.pc = mips.registers[d->regs.r.rs];
 	}
+	*/ 
+	
+	//Let's try to do implement this stage like the others, by looking at the type (i.e. R, J, or I type)
+	//Pay attention to the MIPS sheet! that's above was not working. 
+	if (d->type == R) {
+		//JUMP REGISTER
+        if(d->regs.r.funct == 8){
+			mips.pc = 4 + val; // val is the int returned from execute, remember!
+		}
+    } if (d->type == J) {
+		mips.pc = mips.pc & 0xf0000000;
+		mips.pc = mips.pc | d->regs.j.target;
+		
+	} if (d->type == J) { 
+		//BRANCH ON EQUAL and BRANCH NOT EQUAL
+		if (d->op == 4 || d->op == 5){
+				d->regs.i.addr_or_immed = d->regs.i.addr_or_immed << 2;
+				mips.pc = mips.pc + d->regs.i.addr_or_immed;
+        }
+	}
 }
 
 /*
@@ -509,23 +541,22 @@ void UpdatePC ( DecodedInstr* d, int val) {
 int Mem( DecodedInstr* d, int val, int *changedMem) {
     /* Your code goes here */
 	
-	
 	int begaddress = 0x00400000;
-	int index = val/4; // we want the index to be the (address - the beginning of the address) / the size (4) 
+	int index = (val - begaddress) >> 2 ; // we want the index to be the (address - the beginning of the address) / the size (4) 
 	
-	if ( (val + begaddress) < 0x00401000 || (val + begaddress)> 0x00403fff){
-		printf("Memory Access Exception at %x: address %x", val, val + begaddress);
-		exit(0);
+	if ( (val + begaddress) > 0x00401000 && (val + begaddress) < 0x00403fff){
+		printf("Memory Access Exception at %x: address %x\n", val, val + begaddress);
 	}
-	if (d->op == 43){ // 43 = opcode of store word
+	if (d->op == 43){ // 43 = opcode of store word 2b
 		mips.memory[index] = mips.registers[d->regs.i.rt];
-		*changedMem = val + begaddress;
-		return -1;
-	} else if (d->op == 35) { // 35 = opcode for load word
+		*changedMem = val; //val + begaddress;
+		
+	} else if (d->op == 35) { // 35 = opcode for load word 23
+		*changedMem = -1;
 		return mips.memory[index];
-	} 
-	
-	
+	} else {
+		*changedMem = -1;
+	}
   return 0;
 }
 
@@ -538,7 +569,8 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
 void RegWrite( DecodedInstr* d, int val, int *changedReg) {
     /* Your code goes here */
 	
-	//R type instructions except for JR 
+	// lines 572 to 582 did not work! Again, let's implement by looking at the type (i.e. R, J, or I type)
+	/*R type instructions except for JR 
 	if (d->op == 0 && d->regs.r.funct != 8) 
 		*changedReg = d->regs.r.rd;
 	
@@ -546,7 +578,37 @@ void RegWrite( DecodedInstr* d, int val, int *changedReg) {
 		*changedReg = d->regs.r.rt;
 	
 	//Do the ones for SW and LW
-	else
-		*changedReg = -1;
+	
 	mips.registers[*changedReg] = val;
+	*/
+	
+	//new implementation below
+	
+	if (d->type == R) {
+		//JUMP REGISTER
+        if(d->regs.r.funct == 8) {
+            *changedReg = -1;
+        } else {
+            mips.registers[d->regs.r.rd] = val;
+			*changedReg = d->regs.r.rd;
+        }
+		
+    } else if (d->type == J) {
+		//JUMP AND LINK
+		if (d->op == 3) {
+            mips.registers[31] = val; // Remember, this is from the MIPS sheet!
+			*changedReg = 31;  
+        }
+        *changedReg = -1;
+		
+	} else if (d->type == I) {
+		//BRANCH NOT EQUAL and SW
+        if (d->op == 5 || d->op == 43) {
+            *changedReg = -1;
+        } else {
+            mips.registers[d->regs.i.rt] = val;
+			*changedReg = d->regs.i.rt;
+        }
+    }
+}
 }
