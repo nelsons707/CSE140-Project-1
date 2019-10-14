@@ -1,3 +1,8 @@
+/*
+CSE 140: Project 1
+Partners: Malia Bowman and Nelson Swasono
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -209,9 +214,8 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		d->regs.r.rt = rt;
 		
 		unsigned int rd = instr; // rd is the 5 bits of rd
-		rd = rd << 16;
 		//get rid of the opcode, rs and rt
-		
+		rd = rd << 16;
 		rd = rd >> 27;
 		
 		d->regs.r.rd = rd;
@@ -225,8 +229,8 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		
 		unsigned int funct = instr; // funct is the 5 bits of funct
 		//get rid of the opcode, rs, rt, rd, shamt
-		funct = funct << 27;
-		funct = funct >> 27;
+		funct = funct << 26;
+		funct = funct >> 26;
 		
 		d->regs.r.funct = funct;
 		
@@ -281,6 +285,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 		rVals->R_rt = mips.registers[d->regs.i.rt];
 	} 
 	
+	
 }
 
 /*
@@ -296,22 +301,14 @@ void PrintInstruction ( DecodedInstr* d) {
 			printf("and     $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 		if (d->regs.r.funct == 0x08)
 			printf("jr      $%d\n", d->regs.r.rs);
-		if (d->regs.r.funct == 39)
-			printf("nor     $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 		if (d->regs.r.funct == 37)
 			printf("or      $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 		if (d->regs.r.funct == 42)
 			printf("slt     $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
-		if (d->regs.r.funct == 42)
-			printf("slt     $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
-		if (d->regs.r.funct == 43)
-			printf("sltu    $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 		if (d->regs.r.funct == 0)
 			printf("sll     $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.shamt);
 		if (d->regs.r.funct == 2)
 			printf("srl     $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.shamt);
-		if (d->regs.r.funct == 34)
-			printf("sub     $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 		if (d->regs.r.funct == 35)
 			printf("subu    $%d, $%d, $%d\n", d->regs.r.rd, d->regs.r.rs, d->regs.r.rt);
 	} else if (d->type ==  J) {
@@ -328,28 +325,16 @@ void PrintInstruction ( DecodedInstr* d) {
 			printf("beq     $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, (d->regs.i.addr_or_immed)*4 + 4 + mips.pc);  // check if this is right might have to mult by 4
 		if (d->op == 5)
 			printf("bne     $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, (d->regs.i.addr_or_immed) * 4 + 4 + mips.pc);
-		if (d->op == 36)
-			printf("lbu     $%d, $%d, %d\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
-		if (d->op == 37)
-			printf("lhu     $%d, $%d, %d\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
-		if (d->op == 48)
-			printf("11      $%d, $%d, %d\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
 		if (d->op == 15)
 			printf("lui     $%d, 0x%x\n", d->regs.i.rt, d->regs.i.addr_or_immed);
 		if (d->op == 35)
 			printf("lw      $%d, %d($%d)", d->regs.i.rt, d->regs.i.addr_or_immed, d->regs.r.rs);
 		if (d->op == 13)
 			printf("ori     $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
-		if (d->op == 10)
-			printf("slti    $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
-		if (d->op == 11)
-			printf("sltiu   $%d, $%d, 0x%x\n", d->regs.i.rt, d->regs.i.rs, d->regs.i.addr_or_immed);
 		if (d->op == 43)
 			printf("sw      $%d, %d($%d)", d->regs.i.rt, d->regs.i.addr_or_immed, d->regs.i.rs);
 	}
-	else {
-		exit(0);
-	}
+	
 	
 }
 
@@ -427,7 +412,7 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 		
 		//Load Upper Immediate
 		}else if (d->op == 15) {
-			 return (rVals->R_rs << 4);	 //Supposed to be the upper 16 bits, is this it? 
+			 return (rVals->R_rs << 16);	 //Supposed to be the upper 16 bits, is this it? 
 		}
 		
 		//Load word
@@ -454,7 +439,8 @@ int Execute ( DecodedInstr* d, RegVals* rVals) {
 
 		//JUMP and LINK
 		if (d->op == 3) {
-			return (d->regs.j.target << 2);
+			return mips.pc+4;
+			//return (d->regs.j.target << 2);
 			//mips.registers[31] = 8 + mips.pc;
 			//mips.pc = d->regs.j.target;
 		    //val = mips.pc;
